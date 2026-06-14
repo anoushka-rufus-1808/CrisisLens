@@ -151,7 +151,8 @@ export default function Dashboard() {
         }),
       );
 
-      const startRes = await fetch("/api/forecast/run", {
+      const { API_BASE } = await import("@/utils/apiBase");
+      const startRes = await fetch(`${API_BASE}/api/forecast/run`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -170,7 +171,7 @@ export default function Dashboard() {
       const { runId } = await startRes.json() as { runId: string };
 
       const collectedScores: Record<string, number> = {};
-      const es = new EventSource(`/api/forecast/stream/${runId}`);
+      const es = new EventSource(`${API_BASE}/api/forecast/stream/${runId}`);
       activeSourceRef.current = es;
 
       es.onmessage = (event) => {
