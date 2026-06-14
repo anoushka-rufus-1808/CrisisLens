@@ -240,7 +240,8 @@ export default function ForecastPanel() {
         cursor.setDate(cursor.getDate() + 1);
       }
 
-      const endpoint = m === "compare" ? "/api/forecast/compare" : "/api/forecast";
+      const { API_BASE } = await import("@/utils/apiBase");
+      const endpoint = m === "compare" ? `${API_BASE}/api/forecast/compare` : `${API_BASE}/api/forecast`;
       const payload  = {
         data:        extended,
         horizon:     h,
