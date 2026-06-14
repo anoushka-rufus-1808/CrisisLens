@@ -250,7 +250,8 @@ export async function runFacilityForecast(params: {
   };
 
   try {
-    const res  = await postWithTimeout("/api/forecast", body);
+    const { API_BASE } = await import("@/utils/apiBase");
+    const res  = await postWithTimeout(`${API_BASE}/api/forecast`, body);
     const text = await res.text();
 
     type ApiResp = {
