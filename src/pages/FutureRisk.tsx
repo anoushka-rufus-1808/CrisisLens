@@ -217,7 +217,8 @@ export default function FutureRisk() {
       }
 
       // FIX: use safeForecastPost instead of raw fetch + res.json()
-      const data = await safeForecastPost("/api/forecast", {
+      const { API_BASE } = await import("@/utils/apiBase");
+      const data = await safeForecastPost(`${API_BASE}/api/forecast`, {
         data:        extended,
         horizon:     h,
         model:       m,
