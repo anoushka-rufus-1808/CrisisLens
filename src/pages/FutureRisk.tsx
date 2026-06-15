@@ -145,7 +145,7 @@ async function safeForecastPost(
       body:    JSON.stringify(body),
     });
   } catch {
-    throw new Error("Cannot reach the forecast service — is it running on port 8001?");
+    throw new Error("Cannot reach the forecast service. Please try again.");
   }
 
   const text = await res.text();
