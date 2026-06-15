@@ -35,8 +35,8 @@ from routes.facilities import router as facilities_router
 from routes.forecast_sse import router as forecast_sse_router
 
 init_db()
-app.include_router(facilities_router)
-app.include_router(forecast_sse_router, prefix="/forecast")
+app.include_router(facilities_router, prefix="/api")
+app.include_router(forecast_sse_router, prefix="/api/forecast")
 
 # ── Global exception handler ──────────────────────────────────────────────────
 @app.exception_handler(Exception)
@@ -253,11 +253,11 @@ def run_random_forest(df: pd.DataFrame, horizon: int):
         raise HTTPException(status_code=500, detail=f"Random Forest error: {str(e)}")
 
 # ── Routes ────────────────────────────────────────────────────────────────────
-@app.get("/healthz")
+@app.get("/api/healthz")
 def health():
     return {"status": "healthy", "cache_entries": len(_cache), "prophet_available": PROPHET_AVAILABLE}
 
-@app.post("/forecast", response_model=ForecastResponse)
+@app.post("/api/forecast", response_model=ForecastResponse)
 def forecast(req: ForecastRequest):
     if req.horizon not in [30, 60, 90]:
         raise HTTPException(status_code=400, detail="horizon must be 30, 60, or 90")
@@ -294,7 +294,7 @@ def forecast(req: ForecastRequest):
     _set_cached(cache_key, result)
     return ForecastResponse(**result)
 
-@app.post("/forecast/compare")
+@app.post("/api/forecast/compare")
 def forecast_compare(req: ForecastRequest):
     if req.horizon not in [30, 60, 90]:
         raise HTTPException(status_code=400, detail="horizon must be 30, 60, or 90")
@@ -334,7 +334,7 @@ def forecast_compare(req: ForecastRequest):
                           "mape": round(rf_mape, 2) if rf_mape is not None else None},
     }
 
-@app.delete("/cache")
+@app.delete("/api/cache")
 def clear_cache():
     count = len(_cache)
     _cache.clear()
@@ -347,7 +347,7 @@ from fastapi.staticfiles import StaticFiles
 _DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
 
 if os.path.isdir(_DIST):
-    # Registered LAST so all /api/* routes above take full priority for every method.
+    # Mounted LAST — all /api/* routes above take full priority for every HTTP method.
     # html=True makes StaticFiles serve index.html for unknown paths (SPA routing).
     app.mount("/", StaticFiles(directory=_DIST, html=True), name="frontend")
 
