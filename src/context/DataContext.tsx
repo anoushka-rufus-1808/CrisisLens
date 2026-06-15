@@ -79,7 +79,7 @@ function vulnerabilityFactor(f: Facility): number {
 }
 
 async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch('${API_BASE}${url}', { headers: { "Content-Type": "application/json" }, ...init });
+  const res = await fetch(`${API_BASE}${url}`, { headers: { "Content-Type": "application/json" }, ...init });
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as { error?: string; detail?: string };
     throw new Error(err.error ?? err.detail ?? `HTTP ${res.status}`);
