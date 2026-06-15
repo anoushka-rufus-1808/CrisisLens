@@ -340,22 +340,16 @@ def clear_cache():
     _cache.clear()
     return {"cleared": count}
 
-# ── Serve React frontend (production build) ────────────────────────────────
+# ── Serve React frontend (production build) ───────────────────────────────────
 import os
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 _DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
 
 if os.path.isdir(_DIST):
-    app.mount("/assets", StaticFiles(directory=os.path.join(_DIST, "assets")), name="assets")
-
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_spa(full_path: str):
-        candidate = os.path.join(_DIST, full_path)
-        if full_path and os.path.isfile(candidate):
-            return FileResponse(candidate)
-        return FileResponse(os.path.join(_DIST, "index.html"))
+    # Registered LAST so all /api/* routes above take full priority for every method.
+    # html=True makes StaticFiles serve index.html for unknown paths (SPA routing).
+    app.mount("/", StaticFiles(directory=_DIST, html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn
