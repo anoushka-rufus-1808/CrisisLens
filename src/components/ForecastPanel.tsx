@@ -157,7 +157,7 @@ async function safePostJson<T>(url: string, body: unknown, signal?: AbortSignal)
     });
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") throw err;
-    throw new Error("Cannot reach the forecast service — is it running on port 8001?");
+    throw new Error("Cannot reach the forecast service. Please try again.");
   }
 
   const text = await res.text();
