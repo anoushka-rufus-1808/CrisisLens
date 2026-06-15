@@ -43,8 +43,6 @@ async def start_forecast_run(req: ForecastRunRequest):
                 vuln     = float(facility.get("vulnerability", 0.5))
                 history  = req.districtHistories.get(district, [])
 
-                # Convert raw weather rows → {date, value} DataPoints
-                # value = climate stress score weighted by facility vulnerability
                 data_points = []
                 for row in history:
                     date = row.get("date") or row.get("ds")
@@ -52,19 +50,18 @@ async def start_forecast_run(req: ForecastRunRequest):
                         continue
                     temp  = float(row.get("temperature_max", row.get("temperature_2m", 35)))
                     rain  = float(row.get("precipitation_sum", row.get("precipitation", 0)))
-                    # Climate stress 0–100: heat drives risk up, rain drives it slightly down
                     stress = min(100.0, max(0.0, (temp - 25.0) * 4.0 - rain * 0.5))
-                    # Weight by facility vulnerability
                     value  = round(min(100.0, stress * (0.5 + 0.5 * vuln)), 4)
                     data_points.append({"date": str(date), "value": value})
 
                 source = "statistical_fallback"
-                score  = round(50.0 * vuln, 2)  # default fallback
+                score  = round(50.0 * vuln, 2)
 
                 if len(data_points) >= 10:
                     try:
+                        port = os.environ.get("PORT", "8001")
                         resp = httpx.post(
-                            f"http://localhost:{os.environ.get('PORT', '8001')}/forecast",
+                            f"http://localhost:{port}/api/forecast",
                             json={
                                 "data":        data_points,
                                 "horizon":     req.horizon,
@@ -84,14 +81,12 @@ async def start_forecast_run(req: ForecastRunRequest):
                             source = "ml" if used != "statistical_fallback" else "statistical_fallback"
                     except Exception as e:
                         print(f"[SSE] ML call failed for {fid}: {e}")
-                        # Keep statistical fallback score already computed above
                         rows = history if isinstance(history, list) else []
                         if rows:
                             temps = [float(r.get("temperature_max", r.get("temperature_2m", 35))) for r in rows[-90:]]
                             avg   = sum(temps) / len(temps) if temps else 35.0
                             score = round(min(100.0, max(0.0, (avg - 25.0) * 4.0 * vuln)), 2)
                 else:
-                    # Not enough history rows — pure statistical
                     rows = history if isinstance(history, list) else []
                     if rows:
                         temps = [float(r.get("temperature_max", r.get("temperature_2m", 35))) for r in rows[-90:]]
@@ -155,7 +150,6 @@ async def stream_forecast(run_id: str):
                 yield f"data: {json.dumps(msg)}\n\n"
 
                 if msg["type"] == "done":
-                    # Compute and stream district averages
                     district_map: dict[str, list[float]] = {}
                     for r in facility_scores.values():
                         d = r.get("district", "")
