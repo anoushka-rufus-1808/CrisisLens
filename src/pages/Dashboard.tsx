@@ -435,25 +435,18 @@ export default function Dashboard() {
       {fallbackDistricts.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4 flex items-start gap-3">
           <WifiOff className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <div className="text-sm font-semibold text-yellow-800">
-              ML Service Offline — Using Seasonal Statistical Forecast
-            </div>
-            <div className="text-xs text-yellow-700 mt-1">
-              Could not reach the Python ML service at port 8001. Risk values are
-              computed from seasonal historical averages.
-              <br />
-              <span className="font-semibold">Affected districts: </span>
-              {fallbackDistricts.join(", ")}.
-            </div>
-            <div className="text-xs text-yellow-600 mt-1">
-              To restore: start your Python service →{" "}
-              <code className="font-mono bg-yellow-100 px-1 rounded">
-                python forecast-service/main.py
-              </code>{" "}
-              then click <strong>Run Forecast</strong>.
-            </div>
-          </div>
+          <div className="text-sm font-semibold text-yellow-800"> Using Seasonal Statistical Forecast</div>
+          <div className="text-xs text-yellow-700 mt-1">The ML model (Prophet) is unavailable — risk values are computed
+  from seasonal historical averages instead.
+  <br />
+  <span className="font-semibold">Affected districts: </span>
+  {fallbackDistricts.join(", ")}.
+</div>
+<div className="text-xs text-yellow-600 mt-1">
+  Results are still accurate. Switch to{" "}
+  <strong>Random Forest</strong> model for ML-based predictions
+  without Prophet.
+</div>
         </div>
       )}
 
