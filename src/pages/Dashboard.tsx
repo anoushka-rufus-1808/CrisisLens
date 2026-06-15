@@ -100,7 +100,7 @@ export default function Dashboard() {
   const [selectedFacility,  setSelectedFacility]  = useState<Facility | null>(null);
   const [modalOpen,         setModalOpen]          = useState(false);
   const [horizon,           setHorizon]            = useState<Horizon>(30);
-  const [model,             setModel]              = useState<ModelType>("prophet");
+  const [model,             setModel]              = useState<ModelType>("random_forest");
   const [fetching,          setFetching]           = useState(false);
   const [apiError,          setApiError]           = useState<string | null>(null);
   const [fallbackDistricts, setFallbackDistricts]  = useState<string[]>([]);
@@ -160,7 +160,7 @@ export default function Dashboard() {
           districtHistories: districtHistoryMap,
           horizon:           h,
           model:             m,
-          concurrency:       5,
+          concurrency:       1,
         }),
       });
 
