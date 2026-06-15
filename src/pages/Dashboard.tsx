@@ -171,6 +171,7 @@ export default function Dashboard() {
       const { runId } = await startRes.json() as { runId: string };
 
       const collectedScores: Record<string, number> = {};
+      let streamCompleted = false;
       const es = new EventSource(`${API_BASE}/api/forecast/stream/${runId}`);
       activeSourceRef.current = es;
 
@@ -222,6 +223,7 @@ export default function Dashboard() {
         }
 
         if (msg.type === "done") {
+          streamCompleted = true;
           setFacilityMLScores({ ...collectedScores });
           setForecastProgress(null);
           setFetching(false);
@@ -230,6 +232,7 @@ export default function Dashboard() {
         }
 
         if (msg.type === "error") {
+          streamCompleted = true;
           setApiError(msg.message ?? "Forecast failed");
           setForecastProgress(null);
           setFetching(false);
@@ -239,6 +242,7 @@ export default function Dashboard() {
       };
 
       es.onerror = () => {
+        if (streamCompleted) return;
         setApiError("Lost connection to forecast stream — please try again");
         setForecastProgress(null);
         setFetching(false);
