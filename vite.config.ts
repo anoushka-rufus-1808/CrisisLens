@@ -11,21 +11,27 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 5000,
     host: "0.0.0.0",
+    allowedHosts: true,
+    watch: {
+      ignored"
+        ["**/.local/**",
+      "**/node_modules/**"],
+  },
     proxy: {
       "/api/forecast": {
-        target: "http://localhost:8001",
+        target: "http://localhost:8000",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },
       "/api/facilities": {
-        target: "http://localhost:8001",
+        target: "http://localhost:8000",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },
       "/api/email": {
-        target: "http://localhost:8001",
+        target: "http://localhost:8000",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },
