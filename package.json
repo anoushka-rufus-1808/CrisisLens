@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently --names \"VITE,FORECAST\" --prefix-colors \"cyan,yellow\" \"vite\" \"python forecast-service/main.py\"",
+    "dev": "vite",
     "dev:frontend": "vite",
     "dev:forecast": "python forecast-service/main.py",
     "build": "vite build",
@@ -76,7 +76,6 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.7.0",
-    "concurrently": "^9.2.1",
     "typescript": "^5.8.3",
     "vite": "^7.0.0"
   }
